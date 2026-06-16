@@ -71,12 +71,15 @@ digraph pmc {
 
 ### (a) Detection Scan
 
+> `scope` may already be known from the invocation arguments (e.g. `/project-maintenance-cycle strategies/grid-trader`). If so, scan `<scope>/`; otherwise scan project-wide (whole project is the default) and let the entry-phase proposal account for what was found.
+
 Run these commands to snapshot the project state before asking the user anything:
 
 | Signal | Command |
-|---|---|
+| --- | --- |
 | PR / branch | `git branch --show-current` ; `gh pr view --json number,state 2>/dev/null` |
-| AUDIT freshness | `test -f <scope>/AUDIT.md \|\| test -f AUDIT.md` ; compare mtime vs `git log -1 --format=%cd` |
+| AUDIT exists | `find . -maxdepth 3 -name AUDIT.md -not -path '*/.*' 2>/dev/null` (if scope is known, also `test -f <scope>/AUDIT.md`) |
+| AUDIT fresh | `[ "$(stat -c %Y AUDIT.md)" -gt "$(git log -1 --format=%ct -- . ':!docs/' ':!*.md' 2>/dev/null)" ] && echo FRESH \|\| echo STALE` — "fresh" means AUDIT.md's mtime is newer than the latest non-doc commit. Freshness is a heuristic — the conductor states its FRESH/STALE verdict to the user in the Phase 0 AskUserQuestion prompt and lets the user confirm. When in doubt, treat AUDIT.md as authoritative (the no-overwrite rule protects it). |
 | existing plan | `ls docs/plans/*.md 2>/dev/null` |
 | orchestrator setup | `test -f docs/sessions/orchestrator.md` ; `git worktree list` |
 
@@ -85,18 +88,18 @@ Map results to a proposed entry phase:
 - **No AUDIT, no plan** → propose **REVIEW** (full cycle).
 - **Fresh AUDIT exists, no plan** → propose **PLAN** (do NOT re-run review; do NOT overwrite AUDIT — confirm first).
 - **Plan exists, no orchestrator files** → propose **ORCHESTRATE**.
-- **Orchestrator files exist** → tell user the session is ready; **open a new session with `docs/sessions/orchestrator.md`**.
+- **Orchestrator files exist** → tell the user a prior cycle is already set up; instruct them to open a new Claude Code session with `docs/sessions/orchestrator.md` to resume it — then stop.
 
 ### (b) Parameter Collection via AskUserQuestion
 
 Collect all parameters in a single `AskUserQuestion` prompt. Entry phase (derived from the detection scan above) is question 1; include the remaining questions only as needed:
 
 | Parameter | Default | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `scope` | whole project | Path or "whole project" |
-| `effort` | `max` | `low` / `medium` / `high` / `max`; `ultra` is user-triggered only — see Phase 1 |
+| `effort` | `max` | `low` / `medium` / `high` / `max`; `ultra` must be explicitly requested by the user — never assume it as a default. It runs asynchronously in the cloud (billed); the conductor cannot launch it and must hand off (see Phase 1). |
 | `--fix` | **OFF** | Apply fixes inline during review |
 | `--comment` | **ON if PR detected, else OFF** | Post findings as inline PR comments |
-| `phases` | derived from detection | Subset of REVIEW / DOCUMENT / PLAN / ORCHESTRATE |
+| `phases` | derived from detection | Subset of REVIEW / DOCUMENT / PLAN / ORCHESTRATE. Only override the detection-derived entry when the user wants a specific subset (e.g. DOCUMENT only). Otherwise follow the proposed entry phase. |
 
-> **If a fresh `AUDIT.md` already exists and the user did not ask to re-review, do not overwrite it — ask whether to reuse it (enter at PLAN) or regenerate.**
+> **Never overwrite a fresh `AUDIT.md` silently.** If a fresh `AUDIT.md` exists and the user did not explicitly request re-review, propose entering at **PLAN** (reuse it). AUDIT.md may be regenerated ONLY when the user actively chooses re-review — never as a routine default.
