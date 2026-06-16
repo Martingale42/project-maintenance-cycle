@@ -64,3 +64,39 @@ digraph pmc {
 ```
 
 **Skip-entry and gates:** When Phase 0 routes you to a later entry phase, gates for the phases you skipped are treated as already satisfied (e.g. entering at PLAN because a fresh `AUDIT.md` exists means Gate A — doc review — was satisfied in a prior cycle). Gates for phases you DO run still fire normally: entering at PLAN still requires **Gate B** before ORCHESTRATE; entering at ORCHESTRATE assumes Gate B was already passed when the plan was written.
+
+---
+
+## Phase 0 — ORIENT
+
+### (a) Detection Scan
+
+Run these commands to snapshot the project state before asking the user anything:
+
+| Signal | Command |
+|---|---|
+| PR / branch | `git branch --show-current` ; `gh pr view --json number,state 2>/dev/null` |
+| AUDIT freshness | `test -f <scope>/AUDIT.md \|\| test -f AUDIT.md` ; compare mtime vs `git log -1 --format=%cd` |
+| existing plan | `ls docs/plans/*.md 2>/dev/null` |
+| orchestrator setup | `test -f docs/sessions/orchestrator.md` ; `git worktree list` |
+
+Map results to a proposed entry phase:
+
+- **No AUDIT, no plan** → propose **REVIEW** (full cycle).
+- **Fresh AUDIT exists, no plan** → propose **PLAN** (do NOT re-run review; do NOT overwrite AUDIT — confirm first).
+- **Plan exists, no orchestrator files** → propose **ORCHESTRATE**.
+- **Orchestrator files exist** → tell user the session is ready; **open a new session with `docs/sessions/orchestrator.md`**.
+
+### (b) Parameter Collection via AskUserQuestion
+
+Collect all parameters in a single `AskUserQuestion` prompt. Entry phase (derived from the detection scan above) is question 1; include the remaining questions only as needed:
+
+| Parameter | Default | Notes |
+|---|---|---|
+| `scope` | whole project | Path or "whole project" |
+| `effort` | `max` | `low` / `medium` / `high` / `max`; `ultra` is user-triggered only — see Phase 1 |
+| `--fix` | **OFF** | Apply fixes inline during review |
+| `--comment` | **ON if PR detected, else OFF** | Post findings as inline PR comments |
+| `phases` | derived from detection | Subset of REVIEW / DOCUMENT / PLAN / ORCHESTRATE |
+
+> **If a fresh `AUDIT.md` already exists and the user did not ask to re-review, do not overwrite it — ask whether to reuse it (enter at PLAN) or regenerate.**
