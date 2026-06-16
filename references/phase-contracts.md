@@ -22,7 +22,7 @@ All parameters are optional; the conductor supplies them from Phase 0 parameter 
 |---|---|---|
 | `effort` | `low` / `medium` / `high` / `max` / `ultra` | Default the conductor uses: `max`. `ultra` is **user-triggered only** — see constraint below. |
 | `--fix` | flag | Applies findings to the working tree. **OFF by default in this cycle** — fixes are planned deliberately in Phase 3, not applied inline. |
-| `--comment` | flag | Posts findings as inline PR comments. Enable only when a PR exists (detected in Phase 0) or the user explicitly requests it. |
+| `--comment` | flag | Default: ON when a PR is detected (Phase 0), OFF otherwise. Posts findings as inline PR comments. |
 | `<scope>` | path or omit | A path within the repo (e.g. `strategies/grid-trader`) or omitted for whole-project review. |
 
 **Effort semantics:**
@@ -50,7 +50,8 @@ Produces a **findings list** — not a file. The conductor:
 
 1. Captures the findings output in context.
 2. If the findings exceed ~50 lines, stashes them to `./.pmc-findings.md` (a gitignored scratch
-   file; never committed) and carries the path forward.
+   file; never committed — add `.pmc-findings.md` to `.gitignore` if not already present) and
+   carries the path forward.
 3. After the review, states: effort level used, scope covered, and number of findings captured.
 
 ### Terminal / Handoff State
@@ -165,6 +166,8 @@ This means:
 the language and stakes requirement on top of it. The two gates are complementary; neither
 satisfies the other.
 
+Injection order: (1) the conductor opens the `brainstorming` invocation with the zh-TW stakes requirement; (2) `brainstorming` runs with its built-in HARD-GATE; (3) the user approves the design direction; (4) `writing-plans` begins. Gate B is this whole sequence, not a separate post-brainstorming check.
+
 #### Output / Artifacts
 
 `brainstorming` produces a design direction that the user has approved. No files are committed at
@@ -268,6 +271,7 @@ The conductor's terminal action is a handoff instruction. Tell the user:
 - Gate B approved.
 - `writing-plans` completed and `docs/plans/YYYY-MM-DD-<feature>.md` exists.
 - User selected the orchestrator-driven execution option in Phase 3.
+- When Phase 0 routes directly to ORCHESTRATE (a plan already exists), Gate B is treated as satisfied by the existence of that prior plan — do not re-run Gate B.
 
 ---
 

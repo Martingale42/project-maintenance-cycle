@@ -129,7 +129,7 @@ Include flags collected in Phase 0:
 - `--comment` if a PR was detected (or the user requested it)
 - `--fix` if the user opted in
 
-Capture the findings output. If the findings are large (more than ~50 lines), stash them to `./.pmc-findings.md` (a gitignored scratch file — keep it out of git) and carry the path forward; otherwise keep them in context.
+Capture the findings output. If the findings are large (more than ~50 lines), stash them to `./.pmc-findings.md` (before writing it, ensure `./.pmc-findings.md` is gitignored — add it to `.gitignore` if absent — so it is never committed) and carry the path forward; otherwise keep them in context.
 
 After the review completes, state: what effort level was used, what scope was covered, and how many findings were captured. Then proceed to Phase 2.
 
