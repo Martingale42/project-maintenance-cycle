@@ -83,7 +83,7 @@ The conductor passes a freeform instruction using this template:
 
 followed by either:
 - the findings content inline (if short), or
-- a file reference (e.g. `@./.pmc-findings.md`) if the findings were stashed in Phase 1.
+- if the findings were stashed in Phase 1, a plain path reference telling the sub-skill to read from `./.pmc-findings.md` (never an `@`-style reference, which would force-load the file at skill-load time).
 
 ### Scope of Management
 

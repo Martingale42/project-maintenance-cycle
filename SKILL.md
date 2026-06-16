@@ -151,7 +151,7 @@ Do not proceed to Phase 2 until the user returns with the ultra-review output.
 
 ## Phase 2 — DOCUMENT
 
-Invoke the `maintaining-project-docs` skill via the Skill tool. Pass the findings by appending them to the instruction string — inline if short, or as a file reference (e.g. `@./.pmc-findings.md`) if you stashed them in Phase 1. Instruction template:
+Invoke the `maintaining-project-docs` skill via the Skill tool. Pass the findings by appending them to the instruction string — inline if short, or, if you stashed them in Phase 1, by telling `maintaining-project-docs` to read the findings from the scratch file `./.pmc-findings.md` (plain path — never an `@`-style reference, which would force-load). Instruction template:
 
 > `update README.md/CLAUDE.md for <scope> and create AUDIT.md/BACKLOG.md/ROADMAP.md for the findings.` followed by the findings content or file reference.
 
