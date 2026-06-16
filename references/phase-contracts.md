@@ -95,10 +95,10 @@ The `maintaining-project-docs` skill manages:
 | `ROADMAP.md` | Project direction and milestones |
 | `BACKLOG.md` | Prioritized issue list |
 | `CHANGELOG.md` | Release notes |
-| `AUDIT.md` | Findings from the current review cycle |
+| `AUDIT.md` | Audit **index** (Date \| Scope \| Verdict \| Open findings \| Report); `AUDIT.md` is the index — findings themselves live in the immutable `docs/audits/YYYY-MM-DD-<scope>.md` report it points to, and open work items in `BACKLOG.md` |
 | `docs/audits/YYYY-MM-DD-<scope>.md` | Immutable per-cycle audit snapshot — never overwritten |
 | `docs/` (general) | Knowledge docs under `guides/`, `concepts/`, `reference/`, `reports/` |
-| `CLAUDE.md` / `AGENTS.md` | Agent instruction file; `AGENTS.md` is a symlink to `CLAUDE.md` |
+| `CLAUDE.md` / `AGENTS.md` | Agent instruction file; `AGENTS.md` (optional symlink to `CLAUDE.md`, added only when another agent needs it) |
 | `templates/` | Document templates shipped by the skill |
 | `scripts/scaffold-docs.sh` | Bootstrap script for new projects |
 
@@ -146,10 +146,10 @@ These two sub-skills run in sequence. Both are invoked via the **Skill tool**.
 
 ```
 Skill tool → brainstorming
-Idea: "fix all findings in AUDIT.md"
+Idea: "fix all open findings from the latest audit"
 ```
 
-The conductor kicks off brainstorming with the idea phrased exactly as above.
+The conductor kicks off brainstorming with the idea phrased as above. `AUDIT.md` is the audit **index**; the findings themselves live in the immutable `docs/audits/YYYY-MM-DD-<scope>.md` report it points to, and open work items in `BACKLOG.md`. Brainstorming is pointed at the report and BACKLOG (indexed by AUDIT.md), not at AUDIT.md alone.
 
 #### Gate B — Design + Traditional Chinese stakes explanation (mandatory)
 
@@ -203,7 +203,7 @@ Only the **orchestrator-driven** option flows forward to Phase 4.
 ### Prerequisites
 
 - Gate A approved (or skipped as already-satisfied when entering at PLAN with a fresh AUDIT.md).
-- `AUDIT.md` exists and contains findings to address.
+- `AUDIT.md` exists (as the audit index) and the `docs/audits/YYYY-MM-DD-<scope>.md` report it links to contains findings to address; open work items are in `BACKLOG.md`.
 
 ---
 

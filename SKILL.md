@@ -27,7 +27,7 @@ This is a **conductor skill**. It drives a project-maintenance cycle by invoking
 | 0 | **ORIENT** | Detect current state, confirm parameters, decide entry point | `AskUserQuestion` | — |
 | 1 | **REVIEW** | Run code-review, extract findings | `code-review` skill (Skill tool; `ultra` exception: stop and hand off to user) | — |
 | 2 | **DOCUMENT** | Write findings into `AUDIT.md`/`BACKLOG.md`/`ROADMAP.md` + update `README.md`/`CLAUDE.md` | `maintaining-project-docs` skill | **Gate A: user reviews docs** |
-| 3 | **PLAN** | Start design from "fix all findings in AUDIT.md" → write plan | `brainstorming` → `writing-plans` skills | **Gate B: explain design + stakes in zh-TW, then approve** (brainstorming HARD-GATE) |
+| 3 | **PLAN** | Start design from the latest audit's open findings (AUDIT.md indexes them; report in docs/audits/, items in BACKLOG.md) → write plan | `brainstorming` → `writing-plans` skills | **Gate B: explain design + stakes in zh-TW, then approve** (brainstorming HARD-GATE) |
 | 4 | **ORCHESTRATE** | Create worktree + generate orchestrator session files | `using-git-worktrees` + `orchestrator-driven-development` skills | **Terminal handoff: instruct user to open new session with `` `orchestrator.md` ``** |
 
 ### Session Boundary Breakpoints
@@ -83,10 +83,12 @@ Run these commands to snapshot the project state before asking the user anything
 | existing plan | `ls docs/plans/*.md 2>/dev/null` |
 | orchestrator setup | `test -f docs/sessions/orchestrator.md` ; `git worktree list` |
 
-**Freshness check** — "fresh" means AUDIT.md's mtime is newer than the latest non-doc commit:
+**Freshness check** — "fresh" means AUDIT.md's mtime is newer than the latest non-doc commit. Use the `AUDIT.md` path resolved during the detection scan (root `./AUDIT.md` or `<scope>/AUDIT.md`) as `AUDIT_PATH`:
 
 ```bash
-if [ "$(stat -c %Y AUDIT.md)" -gt "$(git log -1 --format=%ct -- . ':!docs/' ':!*.md' 2>/dev/null)" ]; then echo FRESH; else echo STALE; fi
+AUDIT_PATH="<resolved AUDIT.md path from detection>"   # e.g. ./AUDIT.md or <scope>/AUDIT.md
+LATEST="$(git log -1 --format=%ct -- . ':!docs/' ':!*.md' 2>/dev/null)"
+if [ "$(stat -c %Y "$AUDIT_PATH")" -gt "${LATEST:-0}" ]; then echo FRESH; else echo STALE; fi
 ```
 
 Freshness is a heuristic — the conductor states its FRESH/STALE verdict to the user in the Phase 0 `AskUserQuestion` prompt and lets the user confirm. When in doubt, treat AUDIT.md as authoritative (the no-overwrite rule protects it).
@@ -167,7 +169,7 @@ Present a concise summary of every file written or modified (file path + one-lin
 
 ## Phase 3 — PLAN
 
-Invoke the `brainstorming` skill via the Skill tool with the idea: `fix all findings in AUDIT.md`.
+Invoke the `brainstorming` skill via the Skill tool with the idea: `fix all open findings from the latest audit`. `AUDIT.md` is the index — the full findings live in the `docs/audits/YYYY-MM-DD-<scope>.md` report it links to, and open work items are in `BACKLOG.md`; point brainstorming at those, not just the index.
 
 ### Gate B — Design + zh-TW stakes explanation (mandatory, pre-implementation)
 
