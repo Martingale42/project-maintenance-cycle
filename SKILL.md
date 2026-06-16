@@ -206,3 +206,34 @@ Instruct the user to open a new session and paste `docs/sessions/orchestrator.md
 ---
 
 For each sub-skill's exact invocation contract, flags, and artifacts, see `references/phase-contracts.md`.
+
+---
+
+## Red Flags
+
+Each row is a rationalization the conductor must reject — the thought on the left, the rule that counters it on the right.
+
+| Thought | Reality |
+|---|---|
+| "I'll just kick off the ultra review for them" | `ultra` is cloud + billed + user-triggered only. STOP and hand off. |
+| "Docs look fine, skip Gate A" | Gate A is mandatory. Present changes and wait for explicit user approval. |
+| "I'll explain the design in English to save time" | Gate B requires Traditional Chinese + stakes before approval. |
+| "An AUDIT.md is already here, I'll regenerate it" | Don't overwrite a fresh AUDIT. Ask; default to reusing it (enter at PLAN). |
+| "I'll run the orchestrator in this session" | Orchestrator needs a fresh session. Generate files, then hand off. |
+| "Let me restate what code-review/maintaining-project-docs does" | Don't re-document sub-skills. Invoke them; link to phase-contracts.md. |
+| "Add `--fix` so it's faster" | `--fix` defaults OFF. Fixes are planned deliberately in Phase 3. |
+| "The user already approved earlier in this turn — that counts" | Any gate requires an explicit affirmative typed AFTER the phase output is shown. Earlier agreement does not satisfy a later gate. |
+| "There's no AUDIT.md so I can skip Phase 0 and go straight to REVIEW" | Phase 0 ORIENT is mandatory unless the user explicitly names an entry phase. |
+
+---
+
+## Integration
+
+Sub-skills this conductor depends on, listed by phase:
+
+- **REQUIRED SUB-SKILL (Phase 1):** the built-in `code-review` skill — invoke via `Skill tool` with effort and scope; do not re-implement review logic here.
+- **REQUIRED SUB-SKILL (Phase 2):** `maintaining-project-docs` — invoke via `Skill tool` to write `AUDIT.md`, `BACKLOG.md`, `ROADMAP.md`, and update `README.md`/`CLAUDE.md`.
+- **REQUIRED SUB-SKILL (Phase 3):** `superpowers:brainstorming` → `superpowers:writing-plans` — invoke in sequence via `Skill tool`; `brainstorming` must complete with Gate B approval before `writing-plans` begins.
+- **REQUIRED SUB-SKILL (Phase 4):** `superpowers:using-git-worktrees` (create the worktree first) + `superpowers:orchestrator-driven-development` (generate session files inside the worktree).
+
+For exact invocation contracts and artifacts of each sub-skill, see `references/phase-contracts.md`.
