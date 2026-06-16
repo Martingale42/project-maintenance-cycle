@@ -129,7 +129,7 @@ Include flags collected in Phase 0:
 - `--comment` if a PR was detected (or the user requested it)
 - `--fix` if the user opted in
 
-Capture the findings output. If the findings are large (more than ~50 lines), stash them to `$CLAUDE_JOB_DIR/tmp/findings.md` (create the `tmp/` directory if needed) and carry the path forward; otherwise keep them in context.
+Capture the findings output. If the findings are large (more than ~50 lines), stash them to `./.pmc-findings.md` (a gitignored scratch file — keep it out of git) and carry the path forward; otherwise keep them in context.
 
 After the review completes, state: what effort level was used, what scope was covered, and how many findings were captured. Then proceed to Phase 2.
 
@@ -137,7 +137,7 @@ After the review completes, state: what effort level was used, what scope was co
 
 **STOP. Do NOT invoke the review yourself.**
 
-`ultra` runs asynchronously in the cloud, is billed, and is **user-triggered only — you cannot launch it.** Tell the user verbatim:
+`ultra` runs asynchronously in the cloud, is billed, and is **user-triggered only — you cannot launch it.** Tell the user verbatim (substitute the actual scope from Phase 0 for `<scope>`):
 
 > 請您自己在終端機執行：
 >
@@ -151,31 +151,25 @@ Do not proceed to Phase 2 until the user returns with the ultra-review output.
 
 ## Phase 2 — DOCUMENT
 
-Invoke the `maintaining-project-docs` skill via the Skill tool with this instruction (fill in `<scope>`):
+Invoke the `maintaining-project-docs` skill via the Skill tool. Pass the findings by appending them to the instruction string — inline if short, or as a file reference (e.g. `@./.pmc-findings.md`) if you stashed them in Phase 1. Instruction template:
 
-> `update README.md/CLAUDE.md for <scope> and create AUDIT.md/BACKLOG.md/ROADMAP.md for the findings.`
-
-Pass the Phase 1 findings (from context or `tmp/findings.md`) as the AUDIT content for the skill to incorporate.
+> `update README.md/CLAUDE.md for <scope> and create AUDIT.md/BACKLOG.md/ROADMAP.md for the findings.` followed by the findings content or file reference.
 
 After the skill completes and any changed files are committed:
 
-### Gate A — User reviews docs (mandatory)
+### Gate A (mandatory)
 
-Present a summary of every file written or modified (file path + one-line description of change). Then ask the user:
+Present a concise summary of every file written or modified (file path + one-line description of change). Then wait. The user must **explicitly approve in this conversation** (any clear affirmative they type — e.g. 「approved」/「OK, 繼續」) before Phase 3 runs. No implicit approval counts: a prior verbal OK earlier in the turn, 「no changes needed」, or your own judgement that the docs look fine do NOT satisfy Gate A.
 
 > 以上文件請確認後，回覆「approved」才進行 Phase 3 — PLAN。
-
-**Do not proceed to Phase 3 until the user explicitly approves.** No exception — "no changes needed" or a prior verbal OK in the same turn does not satisfy Gate A.
 
 ---
 
 ## Phase 3 — PLAN
 
-Invoke the `brainstorming` skill via the Skill tool, framed as:
+Invoke the `brainstorming` skill via the Skill tool with the idea: `fix all findings in AUDIT.md`.
 
-> **"fix all findings in AUDIT.md"**
-
-### Gate B — Convention injection (mandatory pre-brainstorm instruction)
+### Gate B — Design + zh-TW stakes explanation (mandatory, pre-implementation)
 
 Before `brainstorming` begins any design work, explicitly require the following convention:
 
@@ -183,13 +177,7 @@ Before `brainstorming` begins any design work, explicitly require the following 
 
 This means: explain all design decisions and their stakes in Traditional Chinese in detail; only write the spec/plan after the user explicitly approves the direction. `brainstorming`'s built-in HARD-GATE already enforces no-implementation-before-approval; Gate B adds the language and stakes requirement on top of it.
 
-After `brainstorming` completes and the user has approved the design direction, invoke the `writing-plans` skill via the Skill tool. `writing-plans` will produce a plan file at `docs/plans/YYYY-MM-DD-<feature>.md` and offer the user three execution options:
-
-1. Solo implementation (in current session)
-2. Subagent-driven development
-3. **Orchestrator-driven development** → flows into Phase 4
-
-If the user selects option 3, proceed to Phase 4. Otherwise the cycle ends here.
+After `brainstorming` completes and the user has approved the design direction, invoke the `writing-plans` skill via the Skill tool. After `writing-plans` completes (it produces `docs/plans/YYYY-MM-DD-<feature>.md` and offers execution options), if the user selects the orchestrator-driven execution option, proceed to **Phase 4**. Otherwise the cycle ends here.
 
 ---
 
@@ -197,17 +185,11 @@ If the user selects option 3, proceed to Phase 4. Otherwise the cycle ends here.
 
 ### Step 1 — Create a worktree
 
-**REQUIRED SUB-SKILL:** invoke `using-git-worktrees` via the Skill tool to create an isolated worktree for this implementation cycle. The orchestrator session files must live in this worktree, not on the current branch.
+**REQUIRED SUB-SKILL:** invoke `using-git-worktrees` via the Skill tool to create an isolated worktree for this implementation cycle. Then ensure the active working directory is INSIDE that worktree before invoking `orchestrator-driven-development`, so its `docs/sessions/` and `.claude/agents/` output resolves within the worktree (not the original branch).
 
 ### Step 2 — Generate session files
 
-Invoke `orchestrator-driven-development` via the Skill tool. It will generate:
-
-- `docs/sessions/orchestrator.md` — main orchestrator prompt
-- `docs/sessions/` — executor, reviewer, QA, resume, and progress files
-- `.claude/agents/` — subagent definitions
-
-These files are committed to the worktree branch before the handoff.
+Invoke `orchestrator-driven-development` via the Skill tool. It generates the orchestrator session files under `docs/sessions/` and subagent definitions under `.claude/agents/`, then commits them (see `references/phase-contracts.md` for the exact output structure).
 
 ### Terminal handoff — Breakpoint 2 (mandatory cross-session handoff)
 
@@ -219,9 +201,7 @@ Instruct the user to open a new session and paste `docs/sessions/orchestrator.md
 >
 > `docs/sessions/orchestrator.md`
 >
-> 不要在這個 session 繼續執行 orchestrator — 它必須在全新 session 中啟動。
-
-The conductor's work is done. Do not take any further action in this session.
+> 不要在這個 session 繼續執行 orchestrator — 它必須在全新 session 中啟動。conductor 的工作至此結束，請勿在本 session 繼續任何操作。
 
 ---
 
