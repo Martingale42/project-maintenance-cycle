@@ -13,7 +13,7 @@ This is a **conductor skill**. It drives a project-maintenance cycle by invoking
 
 - You are a conductor. Invoke sub-skills via the Skill tool at phase boundaries; pass each one the right artifact. Never duplicate a sub-skill's internal logic.
 - Always run **Phase 0 ORIENT** first, unless the user explicitly names an entry phase.
-- Honor **every gate** (Gate A, Gate B, terminal handoff). Never skip a gate to "save a round-trip."
+- Honor every gate. **Gate A** and **Gate B** require explicit user approval in this conversation before the next phase runs; the **terminal handoff** means you stop and hand off to a new session, never continue inline. No exceptions — do not skip a gate for any reason (e.g. "user already said OK", "no changes needed", "saves a round-trip").
 - Cross-session boundaries (`ultra` review, orchestrator launch) are **explicit handoffs** — never run them inline/automatically.
 - Reply to the user in **Traditional Chinese** (per their global CLAUDE.md).
 - Run one phase at a time; after each phase, state what happened and what the next phase is.
@@ -26,9 +26,9 @@ This is a **conductor skill**. It drives a project-maintenance cycle by invoking
 |---|---|---|---|---|
 | 0 | **ORIENT** | Detect current state, confirm parameters, decide entry point | `AskUserQuestion` | — |
 | 1 | **REVIEW** | Run code-review, extract findings | `code-review` skill (Skill tool; `ultra` exception: stop and hand off to user) | — |
-| 2 | **DOCUMENT** | Write findings into `AUDIT/BACKLOG/ROADMAP` + update `README/CLAUDE` | `maintaining-project-docs` skill | **Gate A: user reviews docs** |
+| 2 | **DOCUMENT** | Write findings into `AUDIT.md`/`BACKLOG.md`/`ROADMAP.md` + update `README.md`/`CLAUDE.md` | `maintaining-project-docs` skill | **Gate A: user reviews docs** |
 | 3 | **PLAN** | Start design from "fix all findings in AUDIT.md" → write plan | `brainstorming` → `writing-plans` skills | **Gate B: explain design + stakes in zh-TW, then approve** (brainstorming HARD-GATE) |
-| 4 | **ORCHESTRATE** | Create worktree + generate orchestrator session files | `using-git-worktrees` + `orchestrator-driven-development` skills | **Terminal handoff: instruct user to open new session with `orchestrator.md`** |
+| 4 | **ORCHESTRATE** | Create worktree + generate orchestrator session files | `using-git-worktrees` + `orchestrator-driven-development` skills | **Terminal handoff: instruct user to open new session with `` `orchestrator.md` ``** |
 
 ### Session Boundary Breakpoints
 
@@ -62,3 +62,5 @@ digraph pmc {
   "Phase 4: ORCHESTRATE (worktree + orchestrator-driven-development)" -> "Terminal handoff: open new session with orchestrator.md";
 }
 ```
+
+**Skip-entry and gates:** When Phase 0 routes you to a later entry phase, gates for the phases you skipped are treated as already satisfied (e.g. entering at PLAN because a fresh `AUDIT.md` exists means Gate A — doc review — was satisfied in a prior cycle). Gates for phases you DO run still fire normally: entering at PLAN still requires **Gate B** before ORCHESTRATE; entering at ORCHESTRATE assumes Gate B was already passed when the plan was written.
