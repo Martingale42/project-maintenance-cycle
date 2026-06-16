@@ -79,9 +79,17 @@ Run these commands to snapshot the project state before asking the user anything
 | --- | --- |
 | PR / branch | `git branch --show-current` ; `gh pr view --json number,state 2>/dev/null` |
 | AUDIT exists | `find . -maxdepth 3 -name AUDIT.md -not -path '*/.*' 2>/dev/null` (if scope is known, also `test -f <scope>/AUDIT.md`) |
-| AUDIT fresh | `[ "$(stat -c %Y AUDIT.md)" -gt "$(git log -1 --format=%ct -- . ':!docs/' ':!*.md' 2>/dev/null)" ] && echo FRESH \|\| echo STALE` — "fresh" means AUDIT.md's mtime is newer than the latest non-doc commit. Freshness is a heuristic — the conductor states its FRESH/STALE verdict to the user in the Phase 0 AskUserQuestion prompt and lets the user confirm. When in doubt, treat AUDIT.md as authoritative (the no-overwrite rule protects it). |
+| AUDIT fresh | Compare AUDIT.md mtime vs the latest non-doc commit — see freshness check below |
 | existing plan | `ls docs/plans/*.md 2>/dev/null` |
 | orchestrator setup | `test -f docs/sessions/orchestrator.md` ; `git worktree list` |
+
+**Freshness check** — "fresh" means AUDIT.md's mtime is newer than the latest non-doc commit:
+
+```bash
+if [ "$(stat -c %Y AUDIT.md)" -gt "$(git log -1 --format=%ct -- . ':!docs/' ':!*.md' 2>/dev/null)" ]; then echo FRESH; else echo STALE; fi
+```
+
+Freshness is a heuristic — the conductor states its FRESH/STALE verdict to the user in the Phase 0 `AskUserQuestion` prompt and lets the user confirm. When in doubt, treat AUDIT.md as authoritative (the no-overwrite rule protects it).
 
 Map results to a proposed entry phase:
 
