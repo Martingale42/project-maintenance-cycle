@@ -11,29 +11,30 @@ a skill's "tests" are scenario runs).
 ## Commands
 
 ```bash
-# Install / make discoverable (symlink into the user skills dir; loader follows symlinks)
-ln -sfn "$PWD" ~/.claude/skills/project-maintenance-cycle
+# Install / make discoverable (symlink the skill/ payload; loader follows symlinks)
+ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle
 
-# Validate after editing SKILL.md — re-run the dry-run scenarios (see docs/validation/)
-# Dispatch a subagent given ONLY SKILL.md + a scenario; check it enters the right
+# Validate after editing skill/SKILL.md — re-run the dry-run scenarios (see docs/validation/)
+# Dispatch a subagent given ONLY skill/SKILL.md + a scenario; check it enters the right
 # phase, honors Gate A/B, and hands off (never inline) on ultra / orchestrator.
 
 # Structural checks the skill must keep passing
-wc -l SKILL.md                                   # must stay < 500 (writing-skills rule)
-grep -c '@\./\|@~/\|superpowers:' SKILL.md references/phase-contracts.md   # must be 0
+wc -l skill/SKILL.md                             # must stay < 500 (writing-skills rule)
+grep -c '@\./\|@~/\|superpowers:' skill/SKILL.md skill/references/phase-contracts.md   # must be 0
 ```
 
-There is no build/lint/bench step — the deliverable is `SKILL.md` +
-`references/phase-contracts.md`.
+There is no build/lint/bench step — the deliverable is `skill/SKILL.md` +
+`skill/references/phase-contracts.md`.
 
 ## Architecture
 
-`SKILL.md` is the conductor spine: operating rules, the phase state machine,
-Phase 0 detection decision tree, Phase 1–4 execution, gates, red flags, and the
-integration map. `references/phase-contracts.md` holds the exact invocation
-contract + artifacts of each sub-skill (loaded on demand, keeping SKILL.md
-tight). Design rationale lives in `docs/superpowers/specs/`; direction in
-`ROADMAP.md`. The skill **invokes** `code-review`, `maintaining-project-docs`,
+The installed payload lives in `skill/` (the symlink target); the repo root holds
+the project's own docs. `skill/SKILL.md` is the conductor spine: operating rules,
+the phase state machine, Phase 0 detection decision tree, Phase 1–4 execution,
+gates, red flags, and the integration map. `skill/references/phase-contracts.md`
+holds the exact invocation contract + artifacts of each sub-skill (loaded on
+demand, keeping SKILL.md tight). Design rationale lives in
+`docs/superpowers/specs/`; direction in `ROADMAP.md`. The skill **invokes** `code-review`, `maintaining-project-docs`,
 `brainstorming`→`writing-plans`, and `using-git-worktrees`+`orchestrator-driven-development`;
 it never re-implements them.
 

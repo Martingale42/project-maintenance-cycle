@@ -23,12 +23,15 @@ enforces approval gates, and makes cross-session handoffs explicit.
 
 ## Install
 
-The skill is a directory; make it discoverable by symlinking it into your user
-skills directory (the loader follows symlinks):
+The skill payload lives in `skill/`; make it discoverable by symlinking that
+subdirectory into your user skills directory (the loader follows symlinks):
 
 ```bash
-ln -sfn "$PWD" ~/.claude/skills/project-maintenance-cycle
+ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle
 ```
+
+(The repo root holds the project's own docs — README, lifecycle docs, design
+trail — which are kept out of the installed skill payload.)
 
 It then appears as `/project-maintenance-cycle` in new sessions.
 
@@ -61,12 +64,14 @@ straight to PLAN).
 ## Layout
 
 ```
-SKILL.md                       # the conductor spine
-references/phase-contracts.md  # exact invocation contract + artifacts per sub-skill
-docs/superpowers/specs/        # design spec (rationale)
-docs/plans/                    # implementation plan
-docs/validation/               # scenario dry-run results
-ROADMAP.md BACKLOG.md CHANGELOG.md AUDIT.md   # lifecycle docs
+skill/                               # the installed payload (symlink target)
+  SKILL.md                           #   the conductor spine
+  references/phase-contracts.md      #   exact invocation contract + artifacts per sub-skill
+docs/superpowers/specs/              # design spec (rationale)
+docs/plans/                          # implementation plan
+docs/validation/                     # scenario dry-run results
+README.md CLAUDE.md                  # project root: readme + agent instructions
+ROADMAP.md BACKLOG.md CHANGELOG.md AUDIT.md   # project root: lifecycle docs
 ```
 
 ## Status

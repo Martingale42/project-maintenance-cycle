@@ -10,6 +10,12 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- Moved the skill payload into a `skill/` subdirectory (`skill/SKILL.md`,
+  `skill/references/`); lifecycle docs and the design trail stay at the repo
+  root. **Install now symlinks `skill/`**, not the repo root, so the loaded skill
+  directory contains only the payload. Re-point existing installs:
+  `ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle`.
+
 ### Fixed
 
 ## [0.1.0] — 2026-06-17

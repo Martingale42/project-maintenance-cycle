@@ -18,7 +18,7 @@ _None open._ The skill is shipped and feature-complete for its v0.1 scope.
 
 | ID | Status | Item | Where | Source |
 |---|---|---|---|---|
-| PMC-1 | open | Phase 0 freshness check uses GNU `stat -c %Y`; make it work on BSD/macOS `stat` too | `SKILL.md` (Phase 0 — Freshness check) | self |
+| PMC-1 | open | Phase 0 freshness check uses GNU `stat -c %Y`; make it work on BSD/macOS `stat` too | `skill/SKILL.md` (Phase 0 — Freshness check) | self |
 
 ## project-maintenance-cycle — P2 (ergonomics & validation breadth; no behavior change unless noted)
 
@@ -26,12 +26,12 @@ _None open._ The skill is shipped and feature-complete for its v0.1 scope.
 |---|---|---|---|---|
 | PMC-2 | open | Add a dry-run scenario for the document-only partial run | `docs/validation/` | self |
 | PMC-3 | open | Add a dry-run scenario for the orchestrator-files-exist resume path | `docs/validation/` | self |
-| PMC-4 | open | Define `--comment` behavior when `gh` is unavailable | `SKILL.md` (Phase 1) · `references/phase-contracts.md` | self |
+| PMC-4 | open | Define `--comment` behavior when `gh` is unavailable | `skill/SKILL.md` (Phase 1) · `skill/references/phase-contracts.md` | self |
 | PMC-5 | open | Optional short `pmc` alias symlink for quicker invocation | install (`~/.claude/skills/`) | self |
 
 ## Open design questions (resolve at design time — not work items)
 
 - **code-review path-scope contract**: the live test showed `code-review` with a
   path argument and no diff reviews the path's *contents* (not a diff). Decide
-  whether to assert this in `references/phase-contracts.md` — it depends on
+  whether to assert this in `skill/references/phase-contracts.md` — it depends on
   whether `code-review` itself documents the behavior as stable.

@@ -58,8 +58,8 @@ for its v0.1 scope.
 This skill was itself built with the loop it encodes a flavor of: **brainstorm →
 spec → plan → build (per-task implementer + spec-review + code-quality-review
 gates) → final review → merge**. Future changes follow the same: design first,
-keep SKILL.md under 500 lines and at conductor altitude, and re-run the dry-run
-scenarios before merging any change that touches gate or handoff wording.
+keep `skill/SKILL.md` under 500 lines and at conductor altitude, and re-run the
+dry-run scenarios before merging any change that touches gate or handoff wording.
 
 ## Reference index
 
