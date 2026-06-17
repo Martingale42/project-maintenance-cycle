@@ -90,3 +90,7 @@ Shipped v0.1.0 (2026-06-17). Validated with three subagent dry-run scenarios
 (full cycle / partial entry on existing AUDIT / ultra handoff) and exercised
 end-to-end on a real package. See `ROADMAP.md` for direction and `BACKLOG.md`
 for open work.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

@@ -12,6 +12,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   directory (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`).
   Supports `--all` (create missing dirs), explicit target dirs, `--copy`,
   `--force`, and `--uninstall`; idempotent.
+- `LICENSE` — MIT.
 
 ### Changed
 
