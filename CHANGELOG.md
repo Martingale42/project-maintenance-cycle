@@ -6,27 +6,9 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Added
-
-- `install.sh` — symlinks the `skill/` payload into every existing agent skills
-  directory (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`).
-  Supports `--all` (create missing dirs), explicit target dirs, `--copy`,
-  `--force`, and `--uninstall`; idempotent.
-- `LICENSE` — MIT.
-
-### Changed
-
-- Moved the skill payload into a `skill/` subdirectory (`skill/SKILL.md`,
-  `skill/references/`); lifecycle docs and the design trail stay at the repo
-  root. **Install now symlinks `skill/`**, not the repo root, so the loaded skill
-  directory contains only the payload. Re-point existing installs:
-  `ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle`.
-
-### Fixed
-
 ## [0.1.0] — 2026-06-17
 
-First tagged release.
+First release.
 
 ### Added
 
@@ -40,6 +22,17 @@ First tagged release.
 - `docs/validation/2026-06-17-scenario-results.md` — three subagent dry-run
   scenarios (full cycle / partial entry on existing AUDIT / ultra handoff), 3/3 pass.
 - Design spec and implementation plan under `docs/superpowers/specs/` and `docs/plans/`.
+- Project docs: `README.md`, `CLAUDE.md`, and the lifecycle docs (`ROADMAP.md`,
+  `BACKLOG.md`, `CHANGELOG.md`, `AUDIT.md`).
+- `install.sh` — symlinks the `skill/` payload into every existing agent skills
+  directory (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`). Supports
+  `--all`, explicit target dirs, `--copy`, `--force`, and `--uninstall`; idempotent.
+- `LICENSE` — MIT.
 
-<!-- No remote is configured yet; add the compare/release links here when the
-     repo is published, replacing this note (never ship example.invalid). -->
+### Notes
+
+- The installed payload lives in the `skill/` subdirectory (the symlink target);
+  the repo root holds the project docs. Install with `./install.sh`.
+
+[Unreleased]: https://github.com/Martingale42/project-maintenance-cycle/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Martingale42/project-maintenance-cycle/releases/tag/v0.1.0
