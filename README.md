@@ -23,15 +23,25 @@ enforces approval gates, and makes cross-session handoffs explicit.
 
 ## Install
 
-The skill payload lives in `skill/`; make it discoverable by symlinking that
-subdirectory into your user skills directory (the loader follows symlinks):
+Run the install script — it symlinks the `skill/` payload into every agent
+skills directory that exists (`~/.claude/skills`, `~/.codex/skills`,
+`~/.agents/skills`):
+
+```bash
+./install.sh                 # install into all existing target dirs
+./install.sh --all           # ...and create any that are missing
+./install.sh ~/.claude/skills # install into a specific dir only
+./install.sh --uninstall     # remove installs that point at this repo
+```
+
+Only `skill/` is installed; the repo root (README, lifecycle docs, design trail)
+is kept out of the loaded skill. The default is a symlink (live edits, no stale
+copies); pass `--copy` for environments that don't follow symlinks. Equivalent
+manual install:
 
 ```bash
 ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle
 ```
-
-(The repo root holds the project's own docs — README, lifecycle docs, design
-trail — which are kept out of the installed skill payload.)
 
 It then appears as `/project-maintenance-cycle` in new sessions.
 

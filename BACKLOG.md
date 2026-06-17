@@ -28,6 +28,7 @@ _None open._ The skill is shipped and feature-complete for its v0.1 scope.
 | PMC-3 | open | Add a dry-run scenario for the orchestrator-files-exist resume path | `docs/validation/` | self |
 | PMC-4 | open | Define `--comment` behavior when `gh` is unavailable | `skill/SKILL.md` (Phase 1) · `skill/references/phase-contracts.md` | self |
 | PMC-5 | open | Optional short `pmc` alias symlink for quicker invocation | install (`~/.claude/skills/`) | self |
+| PMC-6 | open | `install.sh` uses GNU `readlink -f` (uninstall safety check); add a BSD/macOS fallback | `install.sh` (`points_here`) | self |
 
 ## Open design questions (resolve at design time — not work items)
 

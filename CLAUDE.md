@@ -11,8 +11,9 @@ a skill's "tests" are scenario runs).
 ## Commands
 
 ```bash
-# Install / make discoverable (symlink the skill/ payload; loader follows symlinks)
-ln -sfn "$PWD/skill" ~/.claude/skills/project-maintenance-cycle
+# Install / make discoverable — symlinks skill/ into every existing agent skills
+# dir (~/.claude, ~/.codex, ~/.agents). --all creates missing; --uninstall removes.
+./install.sh
 
 # Validate after editing skill/SKILL.md — re-run the dry-run scenarios (see docs/validation/)
 # Dispatch a subagent given ONLY skill/SKILL.md + a scenario; check it enters the right

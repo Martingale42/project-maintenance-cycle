@@ -8,6 +8,11 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `install.sh` — symlinks the `skill/` payload into every existing agent skills
+  directory (`~/.claude/skills`, `~/.codex/skills`, `~/.agents/skills`).
+  Supports `--all` (create missing dirs), explicit target dirs, `--copy`,
+  `--force`, and `--uninstall`; idempotent.
+
 ### Changed
 
 - Moved the skill payload into a `skill/` subdirectory (`skill/SKILL.md`,
